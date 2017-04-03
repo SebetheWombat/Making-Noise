@@ -7,43 +7,46 @@ var audio_context = window.AudioContext || window.webkitAudioContext;
 
 var soundMaker = new audio_context();
 var oscillator = soundMaker.createOscillator();
+var lf_oscillator = soundMaker.createOscillator();
+var lf_amp = soundMaker.createGain();
+var off = true;
 
-//Connect to audio output
-oscillator.connect(soundMaker.destination);
+lf_amp.gain.value = 100;
+
+//Connect low frequency oscillator to gain
+lf_oscillator.connect(lf_amp)
+//Connect gain to main oscillator
+lf_amp.connect(oscillator.frequency);
+
 
 //Add event listeners
 function addListen(){
 	var noiseBox = document.getElementById("noiseBox");
-	//Allow div to be clickable
-	noiseBox.setAttribute("tabindex",0)
 	//For use like a theramin
 	noiseBox.addEventListener("mousemove", adjustFrequency);
-	//For use like a keyboard
-	noiseBox.addEventListener("keydown", keyboardFrequency);
+	//To stop
+	noiseBox.addEventListener("mousedown", stopTheNoise);
 }
 
 //Adjust the frequency of the oscillator based on the mouse's position on the screen
 function adjustFrequency(e){
-	oscillator.frequency.value = e.clientY;
+	oscillator.frequency.value = e.clientY * 0.5;
+	lf_oscillator.frequency.value = e.clientX-400;
 }
 
-//Adjust frequency with keyboard press
-function keyboardFrequency(e){
-	if(e.key == "z"){
-		//c4 note
-		oscillator.frequency.value = 261.63;
-	} else if (e.key == "x"){
-		//d4 note
-		oscillator.frequency.value = 293.66;
-	} else if (e.key == "c"){
-		//e4 note
-		oscillator.frequency.value = 329.63;
-	} else if (e.key == "v"){
-		//f4 note
-		oscillator.frequency.value = 349.23;
+//Toggle sound on and off with click
+function stopTheNoise(e){
+	if(off){
+		//Connect to audio output
+		oscillator.connect(soundMaker.destination);
+	}else{
+		//Disconnect from audio output
+		oscillator.disconnect(soundMaker.destination);
 	}
-
+	off = !off;
 }
 
-//Start the oscillator
+//Start up the oscillators
 oscillator.start();
+lf_oscillator.start();
+

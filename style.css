@@ -1,7 +1,10 @@
+body{
+	background: #666;
+}
 #noiseBox{
-	margin:0 auto;
 	background: #000;
-	height: 500px;
-	width: 500px;
-	color: #fff;
+	height: 600px;
+	width:100%;
+	color:#bbb;
+	text-align: center;
 }
